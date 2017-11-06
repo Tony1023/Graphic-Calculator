@@ -56,12 +56,20 @@
 			children = (
 				6FBC29621FB0572900AF3A95 /* ViewController.swift */,
 				6FBC29641FB0572900AF3A95 /* Main.storyboard */,
+				6FBC29721FB057A700AF3A95 /* Supporting Files */,
+			);
+			path = "Graphic Calculator";
+			sourceTree = "<group>";
+		};
+		6FBC29721FB057A700AF3A95 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
 				6FBC29601FB0572900AF3A95 /* AppDelegate.swift */,
 				6FBC29671FB0572900AF3A95 /* Assets.xcassets */,
 				6FBC29691FB0572900AF3A95 /* LaunchScreen.storyboard */,
 				6FBC296C1FB0572900AF3A95 /* Info.plist */,
 			);
-			path = "Graphic Calculator";
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
