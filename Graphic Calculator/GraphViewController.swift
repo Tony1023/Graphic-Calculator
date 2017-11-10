@@ -8,8 +8,12 @@
 
 import UIKit
 
-class ViewController: UIViewController
+class GraphViewController: UIViewController
 {
+    @IBOutlet weak var graphView: GraphView!
+    
+
+    
 
 }
 
