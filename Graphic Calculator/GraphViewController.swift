@@ -10,10 +10,19 @@ import UIKit
 
 class GraphViewController: UIViewController
 {
-    @IBOutlet weak var graphView: GraphView!
     
-
+    @IBOutlet weak var graphView: GraphView! {
+        didSet {
+            let pinchHandler = #selector(GraphView.changeScale(reactingTo:))
+            let pinchRecognizer = UIPinchGestureRecognizer(target: graphView, action: pinchHandler)
+            graphView.addGestureRecognizer(pinchRecognizer)
+            let panHandler = #selector(GraphView.changeOrigin(reactingTo:))
+            let panRecognizer = UIPanGestureRecognizer(target: graphView, action: panHandler)
+            graphView.addGestureRecognizer(panRecognizer)
+        }
+    }
     
+    var function: ((Double) -> Double)?
 
 }
 
