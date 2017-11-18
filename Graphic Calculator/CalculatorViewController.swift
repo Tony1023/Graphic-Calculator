@@ -90,6 +90,12 @@ class CalculatorViewController: UIViewController {
     }
     
     @IBAction func useMemory(_ sender: UIButton) {
+        if !brain.evaluate().isPending {
+            display.text = "0"
+            inputs.text = "0"
+            brain = CalculatorBrain()
+            userIsTyping = false
+        }
         brain.setOperand(variable: "M")
         if let result = brain.evaluate().result {
             displayValue = result
@@ -105,9 +111,6 @@ class CalculatorViewController: UIViewController {
             evaluationDictionary!["M"] = displayValue
         }
         displayM.text = "M=" + display.text!
-        // Must set userIsTyping back to false
-        // or the description will be reset to the current content of 
-        // display (which is the result of calling ->M
         userIsTyping = false
         updateResult()
     }
@@ -125,9 +128,13 @@ class CalculatorViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let destinationVC = segue.destination
+        var destinationVC = segue.destination
+        if let navigationVC = destinationVC as? UINavigationController {
+            destinationVC = navigationVC.visibleViewController ?? destinationVC
+        }
         if let graphVC = destinationVC as? GraphViewController {
-            graphVC.function = cos
+            graphVC.functionToGraph = { self.brain.evaluate(using: ["M": $0]).result ?? Double.nan }
+            graphVC.navigationItem.title = self.brain.evaluate().description
         }
     }
 

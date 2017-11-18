@@ -8,7 +8,9 @@
 
 import UIKit
 
-
+protocol GraphData: class {
+    func function(input: Double) -> Double
+}
 
 @IBDesignable
 class GraphView: UIView
@@ -18,9 +20,7 @@ class GraphView: UIView
     
     private var origin: CGPoint! { didSet{ setNeedsDisplay() } }
     
-    //private var originRelativePosition: (xScale: Double, yScale: Double)?
-    
-    var dataSource: GraphViewController?
+    weak var dataSource: GraphData? 
     
     private let defaultPointsPerUnit: CGFloat = 25
     
@@ -36,7 +36,7 @@ class GraphView: UIView
         }
     }
     
-    func changeOrigin(reactingTo pan: UIPanGestureRecognizer) {
+    func moveOrigin(reactingTo pan: UIPanGestureRecognizer) {
         switch pan.state {
         case .changed, .ended:
             let translation = pan.translation(in: self)
@@ -48,26 +48,43 @@ class GraphView: UIView
         }
     }
     
+    func changeOrigin(reactingTo tap: UITapGestureRecognizer) {
+        tap.numberOfTapsRequired = 2
+        tap.numberOfTouchesRequired = 1
+        if tap.state == .ended {
+            origin = tap.location(in: self)
+        }
+    }
+    
     private func pathForFunction() -> UIBezierPath {
         let path = UIBezierPath()
+        if dataSource == nil {
+            print ("Nothing retrieved from GVC!")
+        }
         guard let function = dataSource?.function else {
             print ("Nothing!")
             return path
         }
+        var pathDNE: Bool = false
         let xAxis = (lowerBound: -Double(origin.x / defaultPointsPerUnit / scale), upperBound: Double((bounds.width - origin.x) / defaultPointsPerUnit / scale))
-        let yAxis = (lowerBound: Double((origin.y - bounds.height) / defaultPointsPerUnit / scale), upperBound: Double(origin.y / defaultPointsPerUnit / scale))
+        //let yAxis = (lowerBound: Double((origin.y - bounds.height) / defaultPointsPerUnit / scale), upperBound: Double(origin.y / defaultPointsPerUnit / scale))
         var startedGraphing = false
         for input in stride(from: xAxis.lowerBound, to: xAxis.upperBound, by: Double(1.0 / (defaultPointsPerUnit * scale))) {
             let output = function(input)
             var currentPoint: CGPoint?
-            if !output.isNaN, output <= yAxis.upperBound, output >= yAxis.lowerBound {
+            if output.isNormal || output.isZero {
                 currentPoint = CGPoint(x: origin.x + CGFloat(input) * defaultPointsPerUnit * scale, y: origin.y - CGFloat(output) * defaultPointsPerUnit * scale)
+            } else {
+                pathDNE = true
+                continue
             }
-            //print(currentPoint, input, output)
             if let point = currentPoint {
                 if !startedGraphing {
                     path.move(to: point)
                     startedGraphing = true
+                } else if pathDNE {
+                    path.move(to: point)
+                    pathDNE = false
                 } else {
                     path.addLine(to: point)
                 }
