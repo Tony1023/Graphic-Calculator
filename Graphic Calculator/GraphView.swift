@@ -9,7 +9,7 @@
 import UIKit
 
 protocol GraphData: class {
-    func function(input: Double) -> Double
+    func function(_ input: Double) -> Double
 }
 
 @IBDesignable
@@ -18,7 +18,21 @@ class GraphView: UIView
     @IBInspectable
     var scale: CGFloat = 2.0 { didSet{ setNeedsDisplay() } }
     
-    private var origin: CGPoint! { didSet{ setNeedsDisplay() } }
+    private var offSetToCenter: CGPoint! { didSet{ setNeedsDisplay() } }
+    
+    private var origin: CGPoint! {
+        set {
+            offSetToCenter.x = newValue.x - bounds.midX
+            offSetToCenter.y = newValue.y - bounds.midY
+        }
+        get {
+            if let offSet = offSetToCenter {
+                return CGPoint(x: offSet.x + bounds.midX, y: offSet.y + bounds.midY)
+            } else {
+                return nil
+            }
+        }
+    }
     
     weak var dataSource: GraphData? 
     
@@ -58,16 +72,11 @@ class GraphView: UIView
     
     private func pathForFunction() -> UIBezierPath {
         let path = UIBezierPath()
-        if dataSource == nil {
-            print ("Nothing retrieved from GVC!")
-        }
         guard let function = dataSource?.function else {
-            print ("Nothing!")
             return path
         }
         var pathDNE: Bool = false
         let xAxis = (lowerBound: -Double(origin.x / defaultPointsPerUnit / scale), upperBound: Double((bounds.width - origin.x) / defaultPointsPerUnit / scale))
-        //let yAxis = (lowerBound: Double((origin.y - bounds.height) / defaultPointsPerUnit / scale), upperBound: Double(origin.y / defaultPointsPerUnit / scale))
         var startedGraphing = false
         for input in stride(from: xAxis.lowerBound, to: xAxis.upperBound, by: Double(1.0 / (defaultPointsPerUnit * scale))) {
             let output = function(input)
@@ -94,8 +103,8 @@ class GraphView: UIView
     }
 
     override func draw(_ rect: CGRect) {
-        if origin == nil {
-           origin = CGPoint(x: bounds.midX, y: bounds.midY)
+        if offSetToCenter == nil {
+            offSetToCenter = CGPoint.zero
         }
         pathForFunction().stroke()
         axesDrawer.contentScaleFactor = scale

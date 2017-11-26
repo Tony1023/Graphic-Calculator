@@ -128,6 +128,9 @@ class CalculatorViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if brain.evaluate(using: evaluationDictionary).isPending {
+            return
+        }
         var destinationVC = segue.destination
         if let navigationVC = destinationVC as? UINavigationController {
             destinationVC = navigationVC.visibleViewController ?? destinationVC

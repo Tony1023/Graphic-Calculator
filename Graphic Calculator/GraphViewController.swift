@@ -22,13 +22,15 @@ class GraphViewController: UIViewController, GraphData
             let tapHandler = #selector(GraphView.changeOrigin(reactingTo:))
             let tapRecognizer = UITapGestureRecognizer(target: graphView, action: tapHandler)
             graphView.addGestureRecognizer(tapRecognizer)
-            graphView.dataSource = self
+            if graphView?.dataSource == nil {
+                graphView.dataSource = self
+            }
         }
     }
     
     var functionToGraph: ((Double) -> Double)?
     
-    func function(input: Double) -> Double {
+    func function(_ input: Double) -> Double {
         guard let F = functionToGraph else {
             return Double.nan
         }
