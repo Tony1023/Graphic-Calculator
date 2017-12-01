@@ -63,8 +63,6 @@ class GraphView: UIView
     }
     
     func changeOrigin(reactingTo tap: UITapGestureRecognizer) {
-        tap.numberOfTapsRequired = 2
-        tap.numberOfTouchesRequired = 1
         if tap.state == .ended {
             origin = tap.location(in: self)
         }
